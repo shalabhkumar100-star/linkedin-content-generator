@@ -1,1 +1,1 @@
-{"dependencies": {"react": "^17.0.2","react-dom": "^17.0.2","framer-motion": "^4.1.17","lucide-react": "^0.1.0","vite": "^2.5.8"}}
+{"name":"linkedin-generator","private":true,"version":"0.0.0","type":"module","scripts":{"dev":"vite","build":"vite build","preview":"vite preview"},"dependencies":{"framer-motion":"^11.18.2","lucide-react":"^0.511.0","react":"^18.3.1","react-dom":"^18.3.1"},"devDependencies":{"@vitejs/plugin-react":"^4.3.4","vite":"^5.4.10"}}
