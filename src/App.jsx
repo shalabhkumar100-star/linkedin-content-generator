@@ -1,67 +1,70 @@
-import React, { useState, useMemo } from "react";
-
-const pillars = {
-  "AI Governance": ["#AIGovernance", "#ResponsibleAI", "#AIRisk"],
-  "Technology Risk": ["#TechnologyRisk", "#RiskManagement", "#Controls"],
-  "Strategy & Transformation": ["#Transformation", "#Strategy", "#Execution"],
-};
+import React, { useState } from "react";
 
 export default function App() {
-  const [pillar, setPillar] = useState("AI Governance");
-  const [topic, setTopic] = useState("Making governance practical");
-  const [achievement, setAchievement] = useState("");
-  const [lesson, setLesson] = useState("Governance works when embedded in delivery");
-  const [cta, setCta] = useState("How are you approaching this?");
-  const [version, setVersion] = useState(0);
+  const [file, setFile] = useState(null);
+  const [output, setOutput] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const generatePost = () => {
-    return `One thing I’ve been thinking about in ${pillar}:
+  const generateContent = async () => {
+    if (!file) {
+      alert("Upload a .txt file first");
+      return;
+    }
 
-${topic}
+    setLoading(true);
+    setOutput("");
 
-From my experience: ${achievement || "working across teams and functions"}
+    try {
+      let text = "";
 
-The key takeaway:
-${lesson}
+      if (file.type === "text/plain" || file.name.endsWith(".txt")) {
+        text = await file.text();
+      } else {
+        text = "Unsupported file type for now. Please upload a .txt file.";
+      }
 
-${cta}
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ source: text })
+      });
 
-${pillars[pillar].join(" ")}`;
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Request failed");
+      }
+
+      setOutput(data.result);
+    } catch (error) {
+      setOutput(`Error: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
-
-  const post = useMemo(generatePost, [pillar, topic, achievement, lesson, cta, version]);
 
   return (
     <div className="container">
-      <h1>LinkedIn Content Generator</h1>
+      <h1>AI LinkedIn Content Engine</h1>
 
       <div className="form">
-        <label>Pillar</label>
-        <select value={pillar} onChange={(e) => setPillar(e.target.value)}>
-          {Object.keys(pillars).map((p) => (
-            <option key={p}>{p}</option>
-          ))}
-        </select>
+        <label>Upload source file</label>
+        <input
+          type="file"
+          accept=".txt"
+          onChange={(e) => setFile(e.target.files[0] || null)}
+        />
 
-        <label>Topic</label>
-        <input value={topic} onChange={(e) => setTopic(e.target.value)} />
-
-        <label>Achievement (optional)</label>
-        <textarea value={achievement} onChange={(e) => setAchievement(e.target.value)} />
-
-        <label>Lesson</label>
-        <textarea value={lesson} onChange={(e) => setLesson(e.target.value)} />
-
-        <label>CTA</label>
-        <input value={cta} onChange={(e) => setCta(e.target.value)} />
-
-        <button onClick={() => setVersion((v) => v + 1)}>Regenerate</button>
+        <button onClick={generateContent}>
+          {loading ? "Generating..." : "Generate Content"}
+        </button>
       </div>
 
       <div className="output">
-        <h2>Generated Post</h2>
-        <pre>{post}</pre>
-        <button onClick={() => navigator.clipboard.writeText(post)}>Copy</button>
+        <h2>Output</h2>
+        <pre>{output}</pre>
       </div>
     </div>
   );
