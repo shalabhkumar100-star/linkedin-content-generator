@@ -2,12 +2,13 @@ import React, { useState } from "react";
 
 export default function App() {
   const [file, setFile] = useState(null);
+  const [instructions, setInstructions] = useState("");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const generateContent = async () => {
     if (!file) {
-      alert("Upload a .txt file first");
+      alert("Upload a file first");
       return;
     }
 
@@ -15,20 +16,13 @@ export default function App() {
     setOutput("");
 
     try {
-      let text = "";
-
-      if (file.type === "text/plain" || file.name.endsWith(".txt")) {
-        text = await file.text();
-      } else {
-        text = "Unsupported file type for now. Please upload a .txt file.";
-      }
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("instructions", instructions);
 
       const res = await fetch("/api/generate", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ source: text })
+        body: formData
       });
 
       const data = await res.json();
@@ -53,8 +47,16 @@ export default function App() {
         <label>Upload source file</label>
         <input
           type="file"
-          accept=".txt"
+          accept=".txt,.pdf,.docx,.xlsx"
           onChange={(e) => setFile(e.target.files[0] || null)}
+        />
+
+        <label>Optional guidance</label>
+        <textarea
+          rows={5}
+          placeholder="Example: Write in first person. Make it sharper and more personal. Focus on the opportunity, not just the problem."
+          value={instructions}
+          onChange={(e) => setInstructions(e.target.value)}
         />
 
         <button onClick={generateContent}>
