@@ -10,6 +10,12 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 function parseForm(req) {
   const form = formidable({
     multiples: false,
@@ -86,38 +92,45 @@ export default async function handler(req, res) {
     }
 
     const prompt = `
-You are a professional LinkedIn content writer.
+You are a professional LinkedIn content strategist and carousel writer.
+
+Read the source material and return VALID JSON only.
 
 Write in FIRST PERSON.
-Use phrasing like:
+Use natural phrasing like:
 - "I came across..."
-- "Here's what stood out to me..."
+- "What stood out to me was..."
 - "Here's where I think the opportunity lies..."
 
-Generate:
+Return a JSON object with this exact shape:
+{
+  "posts": [
+    { "type": "story-led", "text": "..." },
+    { "type": "insight-led", "text": "..." },
+    { "type": "authority-style", "text": "..." }
+  ],
+  "hooks": ["...", "...", "..."],
+  "video_script": "...",
+  "suggestions": ["...", "...", "..."],
+  "carousel_slides": [
+    {
+      "title": "...",
+      "body": "...",
+      "style": "title|quote|insight|list|cta"
+    }
+  ]
+}
 
-1. Three LinkedIn post drafts:
-   - story-led
-   - insight-led
-   - concise authority-style
-
-2. Three hook options
-
-3. One short 30-45 second talking-video script
-
-4. Suggestions:
-   - stronger angles to explore
-   - ways to improve the post
-   - other useful content directions
-
-Requirements:
-- human and natural
-- not templated
-- practical
-- grounded in the source
-- do not sound like marketing fluff
-- do not speak like a company brand account
-- avoid making things up beyond the source
+Rules:
+- Give exactly 3 hooks
+- Give 3 to 5 carousel slides
+- Carousel slides should be concise enough to fit visually on slides
+- Make the carousel strong enough to be used directly as a LinkedIn carousel
+- Use source material, not generic filler
+- Keep text human, specific, and non-corporate
+- Avoid markdown
+- Avoid emojis unless they are genuinely useful
+- Suggestions should be practical improvements or alternate angles
 
 Additional instructions:
 ${instructions || "None"}
@@ -126,17 +139,25 @@ Source material:
 ${source}
 `;
 
-    const response = await client.responses.create({
+    const response = await client.chat.completions.create({
       model: "gpt-4o-mini",
-      input: prompt
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.9,
     });
 
-    return res.status(200).json({
-      result: response.output_text || "No output generated."
-    });
+    const raw = response.choices?.[0]?.message?.content || "{}";
+    const parsed = JSON.parse(raw);
+
+    return res.status(200).json(parsed);
   } catch (error) {
     return res.status(500).json({
-      error: error.message || "Generation failed"
+      error: error.message || "Generation failed",
     });
   }
 }
