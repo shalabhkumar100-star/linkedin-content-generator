@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "formidable": "^3.5.1",
+    "html-to-image": "^1.11.11",
     "mammoth": "^1.8.0",
     "openai": "^4.104.0",
     "pdf-parse": "^1.1.1",
