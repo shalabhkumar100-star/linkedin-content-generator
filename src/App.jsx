@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { toPng } from "html-to-image";
 
 function formatBoldText(text) {
-  const parts = text.split(/(\*\*.*?\*\*)/g);
+  const parts = String(text || "").split(/(\*\*.*?\*\*)/g);
   return parts.map((part, idx) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return <strong key={idx}>{part.slice(2, -2)}</strong>;
@@ -12,9 +12,10 @@ function formatBoldText(text) {
 }
 
 function renderParagraphs(text) {
-  return text.split("\n\n").map((para, idx) => (
-    <p key={idx}>{formatBoldText(para)}</p>
-  ));
+  return String(text || "")
+    .split("\n\n")
+    .filter(Boolean)
+    .map((para, idx) => <p key={idx}>{formatBoldText(para)}</p>);
 }
 
 export default function App() {
@@ -46,7 +47,7 @@ export default function App() {
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result.error || "Request failed");
+        throw new Error(result.error || result.raw || "Request failed");
       }
 
       setData(result);
@@ -75,6 +76,7 @@ export default function App() {
 
   const downloadAllSlides = async () => {
     if (!data?.carousel_slides?.length) return;
+
     for (let i = 0; i < data.carousel_slides.length; i += 1) {
       // eslint-disable-next-line no-await-in-loop
       await downloadSlide(i);
@@ -91,6 +93,7 @@ export default function App() {
       "slide theme-soft",
       "slide theme-contrast",
     ];
+
     return styles[idx % styles.length];
   };
 
@@ -102,8 +105,7 @@ export default function App() {
             <div className="eyebrow">Iteration 2</div>
             <h1>AI LinkedIn Content Engine</h1>
             <p className="hero-subtitle">
-              Upload a source file, guide the angle, and generate posts plus
-              downloadable carousel slides.
+              Upload a source file, guide the angle, and generate posts plus downloadable carousel slides.
             </p>
           </div>
         </header>
