@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import { toPng } from "html-to-image";
 
 export default function App() {
   const [file, setFile] = useState(null);
   const [instructions, setInstructions] = useState("");
-  const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
+  const slideRefs = useRef([]);
 
   const generateContent = async () => {
     if (!file) {
@@ -13,7 +15,7 @@ export default function App() {
     }
 
     setLoading(true);
-    setOutput("");
+    setData(null);
 
     try {
       const formData = new FormData();
@@ -22,20 +24,62 @@ export default function App() {
 
       const res = await fetch("/api/generate", {
         method: "POST",
-        body: formData
+        body: formData,
       });
 
-      const data = await res.json();
+      const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Request failed");
+        throw new Error(result.error || "Request failed");
       }
 
-      setOutput(data.result);
+      setData(result);
     } catch (error) {
-      setOutput(`Error: ${error.message}`);
+      setData({ error: error.message });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const downloadSlide = async (index) => {
+    const node = slideRefs.current[index];
+    if (!node) return;
+
+    const dataUrl = await toPng(node, {
+      cacheBust: true,
+      pixelRatio: 2,
+      backgroundColor: "#ffffff",
+    });
+
+    const link = document.createElement("a");
+    link.download = `carousel-slide-${index + 1}.png`;
+    link.href = dataUrl;
+    link.click();
+  };
+
+  const downloadAllSlides = async () => {
+    if (!data?.carousel_slides?.length) return;
+    for (let i = 0; i < data.carousel_slides.length; i += 1) {
+      // slight delay helps browser handle sequential downloads
+      // eslint-disable-next-line no-await-in-loop
+      await downloadSlide(i);
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+  };
+
+  const getSlideClass = (style) => {
+    switch (style) {
+      case "quote":
+        return "slide quote";
+      case "cta":
+        return "slide cta";
+      case "list":
+        return "slide list";
+      case "title":
+        return "slide title";
+      default:
+        return "slide insight";
     }
   };
 
@@ -64,10 +108,79 @@ export default function App() {
         </button>
       </div>
 
-      <div className="output">
-        <h2>Output</h2>
-        <pre>{output}</pre>
-      </div>
+      {data?.error && (
+        <div className="output">
+          <h2>Error</h2>
+          <pre>{data.error}</pre>
+        </div>
+      )}
+
+      {data?.posts && (
+        <>
+          <div className="output">
+            <h2>Posts</h2>
+            {data.posts.map((post, idx) => (
+              <div key={idx} className="block">
+                <h3>{post.type}</h3>
+                <pre>{post.text}</pre>
+              </div>
+            ))}
+          </div>
+
+          <div className="output">
+            <h2>Hook Suggestions</h2>
+            <ul>
+              {data.hooks?.map((hook, idx) => (
+                <li key={idx}>{hook}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="output">
+            <h2>Talking Video Script</h2>
+            <pre>{data.video_script}</pre>
+          </div>
+
+          <div className="output">
+            <h2>Suggestions</h2>
+            <ul>
+              {data.suggestions?.map((item, idx) => (
+                <li key={idx}>{item}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="output">
+            <div className="carousel-header">
+              <h2>Carousel Slides</h2>
+              <button onClick={downloadAllSlides}>Download All Slides</button>
+            </div>
+
+            <div className="slides-wrap">
+              {data.carousel_slides?.map((slide, idx) => (
+                <div key={idx} className="slide-card-wrap">
+                  <div
+                    ref={(el) => {
+                      slideRefs.current[idx] = el;
+                    }}
+                    className={getSlideClass(slide.style)}
+                  >
+                    <div className="slide-inner">
+                      <div className="slide-kicker">LinkedIn Carousel</div>
+                      <h3>{slide.title}</h3>
+                      <p>{slide.body}</p>
+                    </div>
+                  </div>
+
+                  <button onClick={() => downloadSlide(idx)}>
+                    Download Slide {idx + 1}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
