@@ -75,17 +75,20 @@ export default async function handler(req, res) {
   try {
     const { fields, files } = await parseForm(req);
     const uploaded = files.file;
+    const sourceText = Array.isArray(fields.sourceText)
+      ? fields.sourceText[0]
+      : fields.sourceText || "";
 
-    if (!uploaded) {
+    if (!uploaded && !sourceText.trim()) {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const file = Array.isArray(uploaded) ? uploaded[0] : uploaded;
     const instructions = Array.isArray(fields.instructions)
       ? fields.instructions[0]
       : fields.instructions || "";
 
-    const source = await extractTextFromFile(file);
+    const file = Array.isArray(uploaded) ? uploaded[0] : uploaded;
+    const source = sourceText.trim() || (file ? await extractTextFromFile(file) : "");
 
     if (!source || !source.trim()) {
       return res.status(400).json({ error: "Could not extract usable text from file" });
