@@ -187,6 +187,14 @@ input[type="file"] {
   background: #f9fafb;
   border-radius: 18px;
   padding: 20px;
+  white-space: normal;
+}
+
+.long-form-post p:first-child {
+  font-size: 22px;
+  line-height: 1.4;
+  font-weight: 800;
+  color: #111827;
 }
 
 .two-col {
@@ -249,15 +257,52 @@ input[type="file"] {
 
 .slide-content h3 {
   margin: 0 0 14px;
-  font-size: 34px;
+  font-size: 30px;
   line-height: 1.05;
+}
+
+.slide-kicker {
+  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: currentColor;
+  opacity: 0.72;
+}
+
+.slide-content h4 {
+  margin: 0 0 14px;
+  font-size: 20px;
+  line-height: 1.25;
+  color: #60a5fa;
 }
 
 .slide-content p {
   margin: 0;
-  font-size: 20px;
+  font-size: 17px;
   line-height: 1.45;
   white-space: pre-wrap;
+}
+
+.slide-bullets {
+  margin: 16px 0 0;
+  padding-left: 18px;
+}
+
+.slide-bullets li {
+  margin-bottom: 8px;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.slide-takeaway {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(148, 163, 184, 0.35);
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 800;
 }
 
 .theme-dark {
