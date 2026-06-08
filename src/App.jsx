@@ -1,5 +1,9 @@
 import React, { useRef, useState } from "react";
 import { toPng } from "html-to-image";
+import * as pdfjsLib from "pdfjs-dist";
+import pdfWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 function formatBoldText(text) {
   const parts = String(text || "").split(/(\*\*.*?\*\*)/g);
@@ -27,6 +31,26 @@ function renderParagraphs(text) {
     ));
 }
 
+async function extractPdfText(file) {
+  const buffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+  const pageTexts = [];
+
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    const page = await pdf.getPage(pageNumber);
+    // eslint-disable-next-line no-await-in-loop
+    const textContent = await page.getTextContent();
+    const text = textContent.items.map((item) => item.str).join(" ");
+
+    if (text.trim()) {
+      pageTexts.push(`Page ${pageNumber}\n${text}`);
+    }
+  }
+
+  return pageTexts.join("\n\n");
+}
+
 export default function App() {
   const [file, setFile] = useState(null);
   const [instructions, setInstructions] = useState("");
@@ -47,8 +71,14 @@ export default function App() {
 
     try {
       const formData = new FormData();
-      formData.append("file", file);
       formData.append("instructions", instructions);
+
+      if (file.name.toLowerCase().endsWith(".pdf")) {
+        const pdfText = await extractPdfText(file);
+        formData.append("sourceText", pdfText);
+      } else {
+        formData.append("file", file);
+      }
 
       const res = await fetch("/api/generate", {
         method: "POST",
