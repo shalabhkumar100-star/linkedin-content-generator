@@ -163,7 +163,8 @@ input[type="file"] {
 }
 
 .post-body p,
-.script-box p {
+.script-box p,
+.long-form-post p {
   margin: 0 0 14px;
   line-height: 1.7;
   color: #1f2937;
@@ -171,9 +172,21 @@ input[type="file"] {
 
 .post-body strong,
 .script-box strong,
+.long-form-post strong,
 .clean-list strong {
   color: #111827;
   font-weight: 800;
+}
+
+.long-form-panel {
+  border-color: #c7d2fe;
+}
+
+.long-form-post {
+  max-width: 860px;
+  background: #f9fafb;
+  border-radius: 18px;
+  padding: 20px;
 }
 
 .two-col {
