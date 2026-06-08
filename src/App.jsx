@@ -15,7 +15,16 @@ function renderParagraphs(text) {
   return String(text || "")
     .split("\n\n")
     .filter(Boolean)
-    .map((para, idx) => <p key={idx}>{formatBoldText(para)}</p>);
+    .map((para, idx) => (
+      <p key={idx}>
+        {para.split("\n").map((line, lineIdx) => (
+          <React.Fragment key={lineIdx}>
+            {lineIdx > 0 && <br />}
+            {formatBoldText(line)}
+          </React.Fragment>
+        ))}
+      </p>
+    ));
 }
 
 export default function App() {
@@ -23,6 +32,7 @@ export default function App() {
   const [instructions, setInstructions] = useState("");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
+  const [copiedLongForm, setCopiedLongForm] = useState(false);
   const slideRefs = useRef([]);
 
   const generateContent = async () => {
@@ -33,6 +43,7 @@ export default function App() {
 
     setLoading(true);
     setData(null);
+    setCopiedLongForm(false);
 
     try {
       const formData = new FormData();
@@ -82,6 +93,18 @@ export default function App() {
       await downloadSlide(i);
       // eslint-disable-next-line no-await-in-loop
       await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+  };
+
+  const copyLongFormPost = async () => {
+    if (!data?.long_form_post) return;
+
+    try {
+      await navigator.clipboard.writeText(data.long_form_post);
+      setCopiedLongForm(true);
+      setTimeout(() => setCopiedLongForm(false), 1800);
+    } catch (error) {
+      setData({ ...data, error: "Could not copy post to clipboard. Please copy it manually." });
     }
   };
 
@@ -153,6 +176,18 @@ export default function App() {
 
         {data?.posts && (
           <>
+            {data.long_form_post && (
+              <section className="panel long-form-panel">
+                <div className="panel-header">
+                  <h2>Best Long-Form Post</h2>
+                  <button className="secondary-btn" onClick={copyLongFormPost}>
+                    {copiedLongForm ? "Copied" : "Copy Post"}
+                  </button>
+                </div>
+                <div className="long-form-post">{renderParagraphs(data.long_form_post)}</div>
+              </section>
+            )}
+
             <section className="panel">
               <div className="panel-header">
                 <h2>Post Drafts</h2>
