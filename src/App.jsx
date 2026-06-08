@@ -31,6 +31,18 @@ function renderParagraphs(text) {
     ));
 }
 
+function renderSlideBullets(items) {
+  if (!Array.isArray(items) || !items.length) return null;
+
+  return (
+    <ul className="slide-bullets">
+      {items.filter(Boolean).map((item, idx) => (
+        <li key={idx}>{formatBoldText(item)}</li>
+      ))}
+    </ul>
+  );
+}
+
 async function extractPdfText(file) {
   const buffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
@@ -284,8 +296,12 @@ export default function App() {
                       <div className="slide-inner">
                         <div className="slide-number">0{idx + 1}</div>
                         <div className="slide-content">
+                          {slide.kicker && <div className="slide-kicker">{slide.kicker}</div>}
                           <h3>{slide.title}</h3>
-                          <p>{slide.body}</p>
+                          {slide.subtitle && <h4>{slide.subtitle}</h4>}
+                          {slide.body && <p>{slide.body}</p>}
+                          {renderSlideBullets(slide.bullets)}
+                          {slide.takeaway && <div className="slide-takeaway">{slide.takeaway}</div>}
                         </div>
                       </div>
                     </div>
