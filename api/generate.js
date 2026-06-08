@@ -118,8 +118,12 @@ Return a JSON object with this exact shape:
   "suggestions": ["...", "...", "..."],
   "carousel_slides": [
     {
+      "kicker": "...",
       "title": "...",
+      "subtitle": "...",
       "body": "...",
+      "bullets": ["...", "...", "..."],
+      "takeaway": "...",
       "style": "title|quote|insight|list|cta"
     }
   ]
@@ -132,13 +136,25 @@ Rules:
 - The long-form post should be designed to create engagement
 - The long-form post can reuse or expand on the best ideas from the 3 shorter drafts
 - The long-form post should make a clear point of view, not just summarize
-- The long-form post should include a strong hook, concise paragraphs, and a closing engagement question
+- The long-form post should be formatted for LinkedIn, not as an essay
+- The long-form post should open with a strong one-line hook
+- Use short paragraphs with blank lines between them
+- Use a short bullet list when it makes the point clearer
+- End with a direct engagement question
+- Include 3 to 6 relevant hashtags on the final line
 - Do not make the long-form post a personal announcement unless the user explicitly asks
 - Do not add gratitude or personal journey framing unless the source material requires it
 - Give exactly 3 hooks
-- Give 3 to 5 carousel slides
-- Carousel slides should be concise and visually ready
-- Make the carousel feel lift-and-shift ready for posting
+- Give 5 to 7 carousel slides
+- Make the carousel a complete narrative, not a random set of cards
+- Carousel slide 1 should be a strong cover slide with a title that can stand alone
+- Carousel slides should use sharp editorial headings, plain-English insight, and commercial relevance
+- Each carousel slide should have one clear idea only
+- Use "kicker" for section labels like "KEY QUESTION", "GOVERNANCE GAP", "WHY IT MATTERS", or "LEADER ACTION"
+- Use "subtitle" for a short emphasis line when useful
+- Use "bullets" for crisp points or questions, not long sentences
+- Use "takeaway" for the slide's punchline or action
+- Make the carousel feel Canva-ready and lift-and-shift ready for posting
 - Use the source material directly and avoid generic filler
 - Do not use markdown anywhere
 - Suggestions should be practical improvements or alternate angles
