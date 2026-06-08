@@ -154,6 +154,12 @@ Rules:
 - Use "subtitle" for a short emphasis line when useful
 - Use "bullets" for crisp points or questions, not long sentences
 - Use "takeaway" for the slide's punchline or action
+- Keep each carousel title under 55 characters
+- Keep each subtitle under 45 characters
+- Keep each body under 160 characters
+- Give no more than 3 bullets per slide
+- Keep each bullet under 55 characters
+- Keep each takeaway under 90 characters
 - Make the carousel feel Canva-ready and lift-and-shift ready for posting
 - Use the source material directly and avoid generic filler
 - Do not use markdown anywhere
