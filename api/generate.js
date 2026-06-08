@@ -109,6 +109,7 @@ Return a JSON object with this exact shape:
     { "type": "insight-led", "text": "..." },
     { "type": "authority-style", "text": "..." }
   ],
+  "long_form_post": "...",
   "hooks": ["...", "...", "..."],
   "video_script": "...",
   "suggestions": ["...", "...", "..."],
@@ -122,6 +123,15 @@ Return a JSON object with this exact shape:
 }
 
 Rules:
+- Also create one long-form LinkedIn post in "long_form_post"
+- The long-form post should be the strongest publish-ready post from the source material and optional user guidance
+- The long-form post should be sharp, clear, commercially relevant, and written for organizations, leaders, professionals, and decision-makers
+- The long-form post should be designed to create engagement
+- The long-form post can reuse or expand on the best ideas from the 3 shorter drafts
+- The long-form post should make a clear point of view, not just summarize
+- The long-form post should include a strong hook, concise paragraphs, and a closing engagement question
+- Do not make the long-form post a personal announcement unless the user explicitly asks
+- Do not add gratitude or personal journey framing unless the source material requires it
 - Give exactly 3 hooks
 - Give 3 to 5 carousel slides
 - Carousel slides should be concise and visually ready
